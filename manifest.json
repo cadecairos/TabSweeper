@@ -1,0 +1,38 @@
+{
+    "manifest_version": 2,
+    "name": "Tab Sweeper",
+    "version": "0.1",
+    "description": "Tidy up your tabs with a click",
+    "homepage_url": "https://github.com/cadecairos/TabSweeper",
+    "permissions": [
+        "storage",
+        "tabs",
+        "notifications"
+    ],
+    "browser_action": {
+        "default_title": "Tab Sweeper",
+        "default_icon": {
+            "25": "icons/tabsweeper.png"
+        }
+    },
+    "sidebar_action": {
+        "default_title": "Tab Sweeper",
+        "default_panel": "/sidebar/panel.html",
+        "default_icon": {
+            "25": "icons/tabsweeper.png"
+        }
+    },
+    "commands": {
+        "_execute_sidebar_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Y"
+            }
+        }
+    },
+    "background": {
+        "scripts": ["tabsweeper.js"]
+    },
+    "icons": {
+        "25": "icons/tabsweeper.png"
+    }
+}

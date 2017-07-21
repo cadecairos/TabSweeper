@@ -1,0 +1,19 @@
+.top-row { margin-top: 20px; }
+.row-space { margin-top: 15px; }
+
+table.table {
+    table-layout: fixed;
+}
+
+table.table td,
+div.panel-heading {
+    border: 1px solid #ddd !important;
+    padding: 5px 5px;
+}
+
+table.table td a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
