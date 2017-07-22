@@ -104,7 +104,6 @@ class TabSweeper {
      * Save the session to local storage
      */
     saveSession(result) {
-        console.log(result.nothingToClean)
         if (result.nothingToClean) {
             return this.notify(`${this.messages.nothingToClean}${this.messages.pressToOpen}`);
         }
