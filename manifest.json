@@ -27,6 +27,11 @@
             "suggested_key": {
                 "default": "Ctrl+Shift+Y"
             }
+        },
+        "execute-cleanup": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+U"
+            }
         }
     },
     "background": {
