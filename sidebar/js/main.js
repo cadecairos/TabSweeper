@@ -104,11 +104,25 @@ class TabSweeperSideBar {
     }
 
     /*
+     * Format Date for display (M-D-YYYY h:m A)
+     *
+     */
+    formatDate(created) {
+        let date = new Date(created);
+        let month = ("0"+ (date.getMonth() + 1)).slice(-2);
+        let day = ("0" + date.getDate()).slice(-2);
+        let year = date.getFullYear();
+        let hours = ("0" + date.getHours()).slice(-2);
+        let minutes = ("0" + date.getMinutes()).slice(-2);
+
+        return `${day}-${month}-${year} ${hours}:${minutes}`;
+    }
+
+    /*
      * Output a single session's URLs
-     * TODO: split this up into smaller chunks
      */
     outputSessionUrls(session, sessionIndex) {
-        let created =  "asdf";// TODO replace moment
+        let created = this.formatDate(session.created);
         let pluralized = polyglot.t("num_tabs", {
             smart_count: session.tabs.length
         });
