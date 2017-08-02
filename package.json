@@ -7,7 +7,7 @@
     "watch:webpack": "webpack --watch",
     "start:firefox": "web-ext run -f nightly -p webext",
     "build": "webpack --optimize-minimize",
-    "package": "web-ext build --ignore-files package.json webpack.config.js web-ext-artifacts sidebar/js/main.js"
+    "package": "web-ext build --ignore-files package.json package-lock.json webpack.config.js web-ext-artifacts sidebar/js/main.js"
   },
   "repository": {
     "type": "git",
