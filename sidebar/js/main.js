@@ -1,3 +1,5 @@
+import Polyglot from 'node-polyglot';
+
 const storage = browser.storage;
 const tabs = browser.tabs;
 const polyglot = new Polyglot();
@@ -6,26 +8,29 @@ polyglot.extend({
   "num_tabs": "%{smart_count} tab |||| %{smart_count} tabs",
 });
 
+
 class TabSweeperSideBar {
     constructor() {
         this.sessions = [];
-        this.sessionContainer = $("#session-container");
-        this.clearAll = $("button#clearall");
+        this.sessionContainer = document.querySelector("#session-container");
+        this.clearAll = document.querySelector("button#clearall");
         this.timeoutId;
 
         this.tags = {
-            DIV: "<div>",
-            SPAN: "<span>",
-            TABLE: "<table>",
-            TR: "<tr>",
-            TD: "<td>",
-            BUTTON: "<button>",
-            A: "<a>"
+            DIV: "div",
+            SPAN: "span",
+            TABLE: "table",
+            TR: "tr",
+            TD: "td",
+            BUTTON: "button",
+            A: "a"
         };
 
         // clear all session data
         this.clearAll.click(() => this.clearSessionData());
         tabs.onRemoved.addListener(() => this.refresh());
+
+        this.render();
     }
 
     /*
@@ -90,9 +95,11 @@ class TabSweeperSideBar {
      */
     clearSessionContainer() {
         return new Promise((resolve, reject) => {
-            this.sessionContainer.empty().promise()
-            .done(resolve)
-            .fail(reject);
+            let container = this.sessionContainer;
+            while(container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            resolve();
         });
     }
 
@@ -101,58 +108,61 @@ class TabSweeperSideBar {
      * TODO: split this up into smaller chunks
      */
     outputSessionUrls(session, sessionIndex) {
-        let created = moment(session.created).format("HH:mm:ss D/M/YYYY");
+        let created =  "asdf";// TODO replace moment
         let pluralized = polyglot.t("num_tabs", {
             smart_count: session.tabs.length
         });
 
-        let urlPanel = $(this.tags.DIV);
+        // set up panel
+        let urlPanel = document.createElement(this.tags.DIV);
+        urlPanel.classList.add("panel", "panel-default");
 
-        urlPanel.addClass("panel", "panel-default")
-        .append(
-            $(this.tags.DIV)
-            .addClass("panel-heading")
-            .text(`${pluralized} - ${created}`)
-        );
+        // set up panel heading
+        let panelHeading = document.createElement(this.tags.DIV);
+        panelHeading.classList.add("panel-heading");
+        panelHeading.textContent = `${pluralized} - ${created}`;
 
-        let urlTable = $(this.tags.TABLE);
+        // set up table element
+        let urlTable = document.createElement(this.tags.TABLE);
+        urlTable.classList.add("table", "table-responsive");
 
-        urlTable.addClass("table", "table-responsive");
-        urlPanel.append(urlTable);
+        // append panel heading and table to the panel
+        urlPanel.appendChild(panelHeading);
+        urlPanel.appendChild(urlTable);
 
         session.tabs.forEach((tab, index) => {
-            let urlTableRow = $(this.tags.TR);
-            let urlTableData = $(this.tags.TD);
-            let closeBtn = $(this.tags.BUTTON);
+            let urlTableRow = document.createElement(this.tags.TR);
+            let urlTableData = document.createElement(this.tags.TD);
+            let closeBtn = document.createElement(this.tags.BUTTON);
+            let closeSpan = document.createElement(this.tags.SPAN);
+            let anchor = document.createElement(this.tags.A)
 
-            closeBtn
-            .addClass("close")
-            .attr("type", "button")
-            .attr("aria-label", "Close")
-            .append(
-                $(this.tags.SPAN)
-                .attr("aria-hidden", "true")
-                .append("&times;")
-            )
-            .click(() => this.removeTab(session, index, sessionIndex));
+            closeBtn.classList.add("close");
+            closeBtn.setAttribute("type", "button");
+            closeBtn.setAttribute("aria-label", "Close");
 
-            urlTableData.append(closeBtn);
+            closeSpan.innerHTML = "&times;";
 
-            let anchor = $(this.tags.A)
-            .attr("href", "#")
-            .text(tab.url)
-            .click(() => {
+            closeBtn.appendChild(closeSpan);
+
+            closeBtn.addEventListener("click", () => this.removeTab(session, index, sessionIndex));
+
+            urlTableData.appendChild(closeBtn);
+
+            anchor.setAttribute("href", "#");
+            anchor.textContent = tab.url;
+            anchor.addEventListener("click", () => {
                 tabs.create({
                     url: tab.url
                 });
             });
 
-            urlTableData.append(anchor)
-            urlTableRow.append(urlTableData)
-            urlTable.append(urlTableRow);
+            urlTableData.appendChild(anchor)
+            urlTableRow.appendChild(urlTableData)
+            urlTable.appendChild(urlTableRow);
         });
 
-        this.sessionContainer.append(urlPanel);
+        this.sessionContainer.appendChild(urlPanel);
     }
 
     removeTab(session, index, sessionIndex) {
@@ -179,4 +189,3 @@ class TabSweeperSideBar {
 }
 
 let tabSweeperSideBar = new TabSweeperSideBar();
-tabSweeperSideBar.render();
