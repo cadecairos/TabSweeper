@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "description": "A Firefox Web Extension for tidying up tabs without losing them",
   "scripts": {
-    "build": "webpack --config webpack.config.js --optimize-minimize"
+    "watch": "npm-run-all -p watch:webpack start:firefox",
+    "watch:webpack": "webpack --watch",
+    "start:firefox": "web-ext run -f nightly -p webext",
+    "build": "webpack --optimize-minimize",
+    "package": "web-ext build --ignore-files package.json webpack.config.js web-ext-artifacts sidebar/js/main.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +25,8 @@
     "babel-preset-es2015": "^6.24.1",
     "bootstrap": "^3.3.7",
     "node-polyglot": "^2.2.2",
+    "npm-run-all": "^4.0.2",
+    "web-ext": "^2.0.0",
     "webpack": "^3.4.1"
   }
 }
