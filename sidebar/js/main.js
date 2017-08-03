@@ -119,6 +119,22 @@ class TabSweeperSideBar {
     }
 
     /*
+     * Restore a tabs in a session
+     */
+    restoreTab(tab) {
+        tabs.create({
+            url: tab.url
+        });
+    }
+
+    /*
+     * Restore all tabs in a session
+     */
+    restoreSession(session) {
+        session.tabs.forEach(tab => this.restoreTab(tab));
+    }
+
+    /*
      * Output a single session's URLs
      */
     outputSessionUrls(session, sessionIndex) {
@@ -127,20 +143,28 @@ class TabSweeperSideBar {
             smart_count: session.tabs.length
         });
 
-        // set up panel
         let urlPanel = document.createElement(this.tags.DIV);
+        let panelHeading = document.createElement(this.tags.DIV);
+        let urlTable = document.createElement(this.tags.TABLE);
+        let restoreAllBtn = document.createElement(this.tags.BUTTON);
+
+        // panel classes
         urlPanel.classList.add("panel", "panel-default");
 
-        // set up panel heading
-        let panelHeading = document.createElement(this.tags.DIV);
+        // heading classes and text
         panelHeading.classList.add("panel-heading");
         panelHeading.textContent = `${pluralized} - ${created}`;
 
-        // set up table element
-        let urlTable = document.createElement(this.tags.TABLE);
+        // table classes
         urlTable.classList.add("table", "table-responsive");
 
+        // button classes
+        restoreAllBtn.classList.add("btn", "btn-primary", "btn-xs");
+        restoreAllBtn.textContent = "Restore Session";
+        restoreAllBtn.addEventListener("click", () => this.restoreSession(session));
+
         // append panel heading and table to the panel
+        panelHeading.appendChild(restoreAllBtn);
         urlPanel.appendChild(panelHeading);
         urlPanel.appendChild(urlTable);
 
@@ -152,7 +176,6 @@ class TabSweeperSideBar {
             let anchor = document.createElement(this.tags.A)
 
             closeBtn.classList.add("close");
-            closeBtn.setAttribute("type", "button");
             closeBtn.setAttribute("aria-label", "Close");
 
             closeSpan.innerHTML = "&times;";
@@ -165,11 +188,7 @@ class TabSweeperSideBar {
 
             anchor.setAttribute("href", "#");
             anchor.textContent = tab.url;
-            anchor.addEventListener("click", () => {
-                tabs.create({
-                    url: tab.url
-                });
-            });
+            anchor.addEventListener("click", () => this.restoreTab(tab));
 
             urlTableData.appendChild(anchor)
             urlTableRow.appendChild(urlTableData)

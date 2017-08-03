@@ -17,3 +17,7 @@ table.table td a {
     white-space: nowrap;
     display: block;
 }
+
+.panel-heading button {
+    margin-left: 1.5em;
+}
