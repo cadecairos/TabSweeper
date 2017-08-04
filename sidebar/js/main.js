@@ -27,7 +27,7 @@ class TabSweeperSideBar {
         };
 
         // clear all session data
-        this.clearAll.click(() => this.clearSessionData());
+        this.clearAll.addEventListener("click", () => this.clearSessionData());
         tabs.onRemoved.addListener(() => this.refresh());
 
         this.render();
@@ -135,14 +135,9 @@ class TabSweeperSideBar {
     }
 
     /*
-     * Output a single session's URLs
+     * Build a session panel
      */
-    outputSessionUrls(session, sessionIndex) {
-        let created = this.formatDate(session.created);
-        let pluralized = polyglot.t("num_tabs", {
-            smart_count: session.tabs.length
-        });
-
+     createSessionPanel(pluralized, created, session) {
         let urlPanel = document.createElement(this.tags.DIV);
         let panelHeading = document.createElement(this.tags.DIV);
         let urlTable = document.createElement(this.tags.TABLE);
@@ -168,31 +163,61 @@ class TabSweeperSideBar {
         urlPanel.appendChild(panelHeading);
         urlPanel.appendChild(urlTable);
 
+        return {
+            urlPanel,
+            urlTable
+        };
+     }
+
+    /*
+     * Build a tab
+     */
+    createTab(session, tab, tabIndex, sessionIndex, urlTable) {
+        let urlTableRow = document.createElement(this.tags.TR);
+        let urlTableData = document.createElement(this.tags.TD);
+        let closeBtn = document.createElement(this.tags.BUTTON);
+        let closeSpan = document.createElement(this.tags.SPAN);
+        let anchor = document.createElement(this.tags.A)
+
+        // set up close button
+        closeBtn.classList.add("close");
+        closeBtn.setAttribute("aria-label", "Close");
+        closeBtn.addEventListener("click", () => {
+            this.removeTab(session, tabIndex, sessionIndex)
+        });
+
+        // add the "X" to the span
+        closeSpan.innerHTML = "&times;";
+
+        // set up the tab anchor
+        anchor.setAttribute("href", "#");
+        anchor.textContent = tab.url;
+        anchor.addEventListener("click", () => this.restoreTab(tab));
+
+        // put everything together
+        closeBtn.appendChild(closeSpan);
+        urlTableData.appendChild(closeBtn);
+        urlTableData.appendChild(anchor)
+        urlTableRow.appendChild(urlTableData)
+        urlTable.appendChild(urlTableRow);
+    }
+
+    /*
+     * Output a single session's URLs
+     */
+    outputSessionUrls(session, sessionIndex) {
+        let created = this.formatDate(session.created);
+        let pluralized = polyglot.t("num_tabs", {
+            smart_count: session.tabs.length
+        });
+
+        let {
+            urlPanel,
+            urlTable
+        } = this.createSessionPanel(pluralized, created, session);
+
         session.tabs.forEach((tab, index) => {
-            let urlTableRow = document.createElement(this.tags.TR);
-            let urlTableData = document.createElement(this.tags.TD);
-            let closeBtn = document.createElement(this.tags.BUTTON);
-            let closeSpan = document.createElement(this.tags.SPAN);
-            let anchor = document.createElement(this.tags.A)
-
-            closeBtn.classList.add("close");
-            closeBtn.setAttribute("aria-label", "Close");
-
-            closeSpan.innerHTML = "&times;";
-
-            closeBtn.appendChild(closeSpan);
-
-            closeBtn.addEventListener("click", () => this.removeTab(session, index, sessionIndex));
-
-            urlTableData.appendChild(closeBtn);
-
-            anchor.setAttribute("href", "#");
-            anchor.textContent = tab.url;
-            anchor.addEventListener("click", () => this.restoreTab(tab));
-
-            urlTableData.appendChild(anchor)
-            urlTableRow.appendChild(urlTableData)
-            urlTable.appendChild(urlTableRow);
+            this.createTab(session, tab, index, sessionIndex, urlTable)
         });
 
         this.sessionContainer.appendChild(urlPanel);
@@ -209,7 +234,7 @@ class TabSweeperSideBar {
 
         this.saveSessions()
         .then(() => this.refresh())
-        .catch(e => console.error(e))
+        .catch(e => console.error(e));
     }
 
     /*
