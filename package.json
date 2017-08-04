@@ -1,6 +1,6 @@
 {
   "name": "tabsweeper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Firefox Web Extension for tidying up tabs without losing them",
   "scripts": {
     "watch": "npm-run-all -p watch:webpack start:firefox",
